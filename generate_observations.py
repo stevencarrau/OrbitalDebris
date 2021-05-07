@@ -166,4 +166,4 @@ for sen in sensor_sites_z:
 		else:
 			repeats = False
 
-write_JSON('sensors_observations_long.json',observations)
+write_JSON('sensors_observations_fixed.json',observations)
