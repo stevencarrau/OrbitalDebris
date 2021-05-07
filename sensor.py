@@ -229,12 +229,15 @@ class Sensor():
 			output_list = ray.get(output_traj)
 			s_points = []
 			z_points = []
-			for weight, out_line in zip(np.array(self.pmf).flatten(), output_list):
+			x_set = np.zeros_like(self.GMM_means)
+			for i,out_line in enumerate(output_list):
 				sigma_points,z_sigma = out_line
 				s_points.append(sigma_points)
 				z_points.append(z_sigma)
+				x_set[:, i] = np.matmul(sigma_weights, sigma_points[:, :6])
 			self.sigma_points = s_points
 			self.z_sigmas = z_points
+			self.GMM_means = x_set
 			self.GMM_estimate()
 		self.output_data[t_i, 1:7] = np.array(self.true_data[t_i,1:]) - self.x_bar.flatten()
 		self.output_data[t_i, 7:13] = np.sqrt(np.diag(self.P_k))

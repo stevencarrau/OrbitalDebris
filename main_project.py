@@ -120,7 +120,7 @@ with open('sensors_observations_long.json') as json_file:
 	sensor_observations = json.load(json_file)
 
 num_pmf = 20
-init_conditions = np.array([-2011.990,-382.065,6316.376,5.419783,-5.945319,1.37398]) ## km, km/s
+init_conditions = np.array([-2012.15,-381.450,6316.61,5400.33,-5.917,1.363]) ## km, km/s
 P0 = np.block([[np.eye((3)),np.zeros((3,3))],[np.zeros((3,3)),1e-6*np.eye(3)]])
 GMM = dict()
 GMM_means = []
@@ -139,6 +139,7 @@ sig_alpha = 10*4.848e-2
 R = sig_alpha**2*np.eye(2)
 Q = 1e-16*np.eye(3)
 sensor_list = [Sensor(str(j),sensor_sites_llh[j],Q,R) for j in sensor_sites_llh]
+sensor_list = [sensor_list[0]]
 for s_i in sensor_list:
 	s_i.initialize(GMM,debris_track)
 	s_i.initialize_data_output(time_range)
