@@ -116,26 +116,40 @@ sensor_raw = np.genfromtxt('SensorSiteDetails_small.csv', delimiter=',')
 sensor_sites_llh = dict([[int(ind_j),[j[5],j[6],j[7]]] for ind_j,j in enumerate(sensor_raw)])
 sensor_sites_ecef = dict([[j,LLH2ECEF(sensor_sites_llh[j][0],sensor_sites_llh[j][1],sensor_sites_llh[j][2])] for j in sensor_sites_llh])
 sensor_sites_z = dict([[j,measurement(sensor_sites_ecef[j])] for j in sensor_sites_ecef])
-with open('sensors_observations_long.json') as json_file:
+with open('sensors_observations_fixed.json') as json_file:
 	sensor_observations = json.load(json_file)
 
-num_pmf = 20
-init_conditions = np.array([-2012.15,-381.450,6316.61,5400.33,-5.917,1.363]) ## km, km/s
-P0 = np.block([[np.eye((3)),np.zeros((3,3))],[np.zeros((3,3)),1e-6*np.eye(3)]])
+# num_pmf = 20
+# init_conditions = np.array([-2012.15,-381.450,6316.61,5.400,-5.917,1.363]) ## km, km/s
+# P0 = np.block([[np.eye((3)),np.zeros((3,3))],[np.zeros((3,3)),1e-6*np.eye(3)]])
+# GMM = dict()
+# GMM_means = []
+# GMM_covars = np.zeros((6,6,num_pmf))
+# GMM_weights = 1.0/num_pmf*np.ones((1,num_pmf))
+# for j in range(num_pmf):
+# 	GMM_covars[:,:,j] = P0
+# 	GMM_means.append(np.random.multivariate_normal(init_conditions,P0))
+
+
+num_pmf = 7
+init_conditions = debris_track[0,1:] ## km, km/s
+P0 = np.block([[50*np.eye((3)),np.zeros((3,3))],[np.zeros((3,3)),50e-6*np.eye(3)]])
 GMM = dict()
 GMM_means = []
-GMM_covars = np.zeros((6,6,num_pmf))
-GMM_weights = 1.0/num_pmf*np.ones((1,num_pmf))
+GMM_covars = np.zeros((6,6,num_pmf+1))
+GMM_weights = 1.0/(num_pmf+1)*np.ones((1,num_pmf+1))
 for j in range(num_pmf):
 	GMM_covars[:,:,j] = P0
 	GMM_means.append(np.random.multivariate_normal(init_conditions,P0))
+GMM_covars[:,:,-1] = P0
+GMM_means.append(init_conditions)
 GMM = dict([['means',np.array(GMM_means).T],['weights',GMM_weights],['covars',GMM_covars]])
 
 t_f = 86401
 
 interval = 5*60
 time_range = list(range(0,t_f,interval))
-sig_alpha = 10*4.848e-2
+sig_alpha = 10*4.848e-6
 R = sig_alpha**2*np.eye(2)
 Q = 1e-16*np.eye(3)
 sensor_list = [Sensor(str(j),sensor_sites_llh[j],Q,R) for j in sensor_sites_llh]

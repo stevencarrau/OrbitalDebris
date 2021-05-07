@@ -48,7 +48,7 @@ sensor_sites_llh = dict([[int(ind_j),[j[5],j[6],j[7]]] for ind_j,j in enumerate(
 rad2deg = 57.2958
 deg2rad = 0.0174533
 fov_params = [120*deg2rad,30*deg2rad]
-sig_alpha = 10*4.848e-2
+sig_alpha = 10*4.848e-6
 R_noise = sig_alpha**2*np.eye(2)
 
 #
@@ -151,9 +151,11 @@ observations = dict([[i,dict()] for i in sensor_sites_z])
 for sen in sensor_sites_z:
 	z_s = sensor_sites_z[sen]
 	repeats = False
+	observations[sen].update({0:list(measurement(debris_track[0][1:]))})
 	for ind_j,i in enumerate(debris_track):
-		z_i = measurement(ECEF2ECI(i[1:4],i[0]))
-		if in_range(z_i,z_s,fov_params):
+		z_rel = measurement(ECEF2ECI(i[1:4],i[0]))
+		z_i = measurement(i[1:4])
+		if in_range(z_rel,z_s,fov_params):
 			if not repeats:
 				repeats = True
 				new_measure = np.random.multivariate_normal(z_i,R_noise)

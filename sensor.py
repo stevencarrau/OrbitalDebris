@@ -20,7 +20,7 @@ A = 3.6e-6
 m = 1350
 thetadot = 7.29211585530066e-5
 tf = 86400
-sig_alpha = 10*4.848e-2
+sig_alpha = 10*4.848e-6
 R = sig_alpha**2*np.eye(2)
 Q = 1e-16*np.eye(3)
 
@@ -68,7 +68,7 @@ def update(ICs,tf,prev_t):
 	# output_res[i, 0] = r_out.t[-1]
 	xout = r_out.y.T[-1][:6] if tf!=0 else ICs[0:6]
 	## Measurement update
-	z_sig = measurement(ECEF2ECI(xout[0:3],tf)) + ICs[-2:]
+	z_sig = measurement(xout[0:3]) + ICs[-2:]
 	return xout,z_sig
 
 
