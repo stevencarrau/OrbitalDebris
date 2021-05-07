@@ -103,9 +103,12 @@ def measurement(x_in):
 
 def save_Local_Belief(sensor_list):
 	sensor_belief = dict()
+	sensor_track = dict()
 	for s_i in sensor_list:
 		sensor_belief.update({s_i.sensor_id:s_i.local_belief_history})
+		sensor_track.update({s_i.sensor_id:s_i.track_history})
 	write_JSON('Sensor_beliefs.json',sensor_belief)
+	write_JSON('Sensor_track.json',sensor_track)
 
 
 debris_track = np.genfromtxt('project_truedata_long.dat',delimiter=',')
@@ -136,7 +139,6 @@ sig_alpha = 10*4.848e-2
 R = sig_alpha**2*np.eye(2)
 Q = 1e-16*np.eye(3)
 sensor_list = [Sensor(str(j),sensor_sites_llh[j],Q,R) for j in sensor_sites_llh]
-# sensor_list = [sensor_list[0]]
 for s_i in sensor_list:
 	s_i.initialize(GMM,debris_track)
 	s_i.initialize_data_output(time_range)

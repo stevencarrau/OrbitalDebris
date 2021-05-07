@@ -176,6 +176,7 @@ class Sensor():
 			self.z_sigmas.append(z_sigma)
 		self.true_data = true_data
 		self.local_belief_history = dict()
+		self.track_history = dict()
 
 	def preprocess_sigma_points(self,xbar,Pbar):
 		Phat = scipy.linalg.block_diag(Pbar, self.Q, self.R)
@@ -238,4 +239,5 @@ class Sensor():
 		self.output_data[t_i, 1:7] = np.array(self.true_data[t_i,1:]) - self.x_bar.flatten()
 		self.output_data[t_i, 7:13] = np.sqrt(np.diag(self.P_k))
 		self.local_belief_history.update({t_k:self.pmf.tolist()})
+		self.track_history.update({t_k:self.GMM_means.tolist()})
 		self.prev_t = t_k
